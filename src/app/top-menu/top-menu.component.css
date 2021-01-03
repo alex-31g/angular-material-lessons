@@ -1,0 +1,8 @@
+/* :host ссылается на элемент, в котором хостится компонент, в данном случае это <top-menu></top-menu> */
+:host {
+  width: 100%;
+  height: 42px;
+  display: block;
+  background: #3f51b5;
+  color: white;
+}
