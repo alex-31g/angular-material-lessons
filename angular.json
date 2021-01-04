@@ -3,50 +3,23 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "angular-material-lessons": {
-      "projectType": "application",
-      "schematics": {
-        "@schematics/angular:class": {
-          "skipTests": true
-        },
-        "@schematics/angular:component": {
-          "skipTests": true
-        },
-        "@schematics/angular:directive": {
-          "skipTests": true
-        },
-        "@schematics/angular:guard": {
-          "skipTests": true
-        },
-        "@schematics/angular:interceptor": {
-          "skipTests": true
-        },
-        "@schematics/angular:module": {
-          "skipTests": true
-        },
-        "@schematics/angular:pipe": {
-          "skipTests": true
-        },
-        "@schematics/angular:service": {
-          "skipTests": true
-        }
-      },
+    "angular-material-course": {
       "root": "",
       "sourceRoot": "src",
-      "prefix": "app",
+      "projectType": "application",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/angular-material-lessons",
+            "aot": true,
+            "outputPath": "dist",
             "index": "src/index.html",
             "main": "src/main.ts",
+            "tsConfig": "src/tsconfig.app.json",
             "polyfills": "src/polyfills.ts",
-            "tsConfig": "tsconfig.app.json",
-            "aot": true,
             "assets": [
-              "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              "src/favicon.ico"
             ],
             "styles": [
               "src/styles.css"
@@ -55,29 +28,24 @@
           },
           "configurations": {
             "production": {
-              "fileReplacements": [
+              "budgets": [
                 {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.prod.ts"
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
                 }
               ],
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
               "namedChunks": false,
+              "aot": true,
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
-              "budgets": [
+              "fileReplacements": [
                 {
-                  "type": "initial",
-                  "maximumWarning": "2mb",
-                  "maximumError": "5mb"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "6kb",
-                  "maximumError": "10kb"
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
                 }
               ]
             }
@@ -86,64 +54,87 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "angular-material-lessons:build"
+            "browserTarget": "angular-material-course:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "angular-material-lessons:build:production"
+              "browserTarget": "angular-material-course:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "angular-material-lessons:build"
+            "browserTarget": "angular-material-course:build"
           }
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
             "main": "src/test.ts",
+            "karmaConfig": "./karma.conf.js",
             "polyfills": "src/polyfills.ts",
-            "tsConfig": "tsconfig.spec.json",
-            "karmaConfig": "karma.conf.js",
-            "assets": [
-              "src/favicon.ico",
-              "src/assets"
-            ],
+            "tsConfig": "src/tsconfig.spec.json",
+            "scripts": [],
             "styles": [
               "src/styles.css"
             ],
-            "scripts": []
+            "assets": [
+              "src/assets",
+              "src/favicon.ico"
+            ]
           }
         },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "tsconfig.app.json",
-              "tsconfig.spec.json",
-              "e2e/tsconfig.json"
+              "src/tsconfig.app.json",
+              "src/tsconfig.spec.json"
             ],
             "exclude": [
               "**/node_modules/**"
             ]
           }
-        },
+        }
+      }
+    },
+    "angular-material-course-e2e": {
+      "root": "",
+      "sourceRoot": "",
+      "projectType": "application",
+      "architect": {
         "e2e": {
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
-            "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "angular-material-lessons:serve"
-          },
-          "configurations": {
-            "production": {
-              "devServerTarget": "angular-material-lessons:serve:production"
-            }
+            "protractorConfig": "./protractor.conf.js",
+            "devServerTarget": "angular-material-course:serve"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "e2e/tsconfig.e2e.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         }
       }
     }
   },
-  "defaultProject": "angular-material-lessons"
+  "defaultProject": "angular-material-course",
+  "schematics": {
+    "@schematics/angular:component": {
+      "style": "scss"
+    },
+    "@schematics/angular:directive": {
+      "prefix": ""
+    }
+  },
+  "cli": {
+    "analytics": "f74fc870-2374-4c02-932d-fe529a3a91f4"
+  }
 }
