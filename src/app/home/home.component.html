@@ -1,1 +1,16 @@
-<p>home works!</p>
+<mat-tab-group>
+  <mat-tab label="Beginners">
+
+    <!-- 
+      [courses]="beginnerCourses" - 
+      передаем input-переменной courses,
+      которая размещена в дочернем компоненте courses-card-list,
+      значение переменной beginnerCourses
+    -->
+    <courses-card-list [courses]="beginnerCourses"></courses-card-list>
+    
+  </mat-tab>
+  <mat-tab label="Advanced">
+    <courses-card-list [courses]="advancedCourses"></courses-card-list>
+  </mat-tab>
+</mat-tab-group>
