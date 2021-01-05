@@ -9,6 +9,7 @@ export class CourseResolver implements Resolve<Course> {
   constructor(private coursesService: CoursesService) {}
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Course> {
+    console.warn('resolver make request');
     return this.coursesService.findCourseById(route.params['id']);
   }
 }

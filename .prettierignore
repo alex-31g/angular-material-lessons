@@ -3,3 +3,6 @@
 
 *.md
 tsconfig.json
+*.ts
+*.js
+*.html
