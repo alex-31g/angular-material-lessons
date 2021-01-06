@@ -38,3 +38,10 @@
 .spinner-container mat-spinner {
   margin: 130px auto 0 auto;
 }
+
+mat-cell,
+mat-header-cell,
+mat-footer-cell {
+  display: inline-block;
+  min-height: auto;
+}
