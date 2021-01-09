@@ -35,4 +35,12 @@
   </mat-table>
   <!-- table - end -->
 
+  <!-- paginator -->
+  <mat-paginator
+    [length]="course?.lessonsCount"
+    [pageSize]="3"
+    [pageSizeOptions]="[3,5,10]"
+  ></mat-paginator>
+  <!-- paginator - end -->
+  
 </div>
