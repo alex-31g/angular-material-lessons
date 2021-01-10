@@ -39,6 +39,10 @@ export class CourseComponent implements OnInit, AfterViewInit {
   // ссылку на MatSort.
   @ViewChild(MatSort) sort: MatSort;
 
+  // С помощью декоратора ViewChild мы получаем из html-шаблона
+  // ссылку на элемент, который обозначенный #input
+  @ViewChild('input') input: ElementRef;
+
   constructor(private route: ActivatedRoute, private coursesService: CoursesService) {}
 
   ngOnInit() {
@@ -58,6 +62,23 @@ export class CourseComponent implements OnInit, AfterViewInit {
     // Каждый раз когда юзер взаимодействует с MatSort -
     // отображаем таблицу с pageIndex = 0
     this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
+
+    // Метод fromEvent - превращает событие в Observable.
+    // 1й параметр - DOM-элемент, на котором произошло событие;
+    // 2й параметр - тип события
+    fromEvent(this.input.nativeElement, 'keyup')
+      .pipe(
+        // debounceTime - эмитит новые данные только по прошедствии заданного времени
+        debounceTime(150),
+        // distinctUntilChanged - эмитит данные только тогда, когда текущее 
+        // значение отличается от последнего.
+        distinctUntilChanged(),
+        tap(() => {
+          this.paginator.pageIndex = 0;
+          this.loadLessonsPage();
+        })
+      )
+      .subscribe();
     
     // this.paginator.page - это Observable, который эмитит события,
     // когда юзер будет взаимодействовать с MatPaginator внутри html
@@ -71,20 +92,20 @@ export class CourseComponent implements OnInit, AfterViewInit {
       // производим загрузку данных в зависимости от данных,
       // полученных с потока
       tap(() => {
-        this.dataSource.loadLessons(
-          this.course.id, 
-          '', 
-          this.sort.direction, 
-          this.paginator.pageIndex, 
-          this.paginator.pageSize
-        );
+        this.loadLessonsPage();
       })
     )
     .subscribe();
   }
 
-  searchLessons(search) {
-    // this.dataSource.filter = search.toLocaleLowerCase().trim();
+  loadLessonsPage() {
+    this.dataSource.loadLessons(
+      this.course.id, 
+      this.input.nativeElement.value, 
+      this.sort.direction, 
+      this.paginator.pageIndex, 
+      this.paginator.pageSize
+    );
   }
 
 }
