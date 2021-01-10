@@ -32,10 +32,12 @@ export class CourseComponent implements OnInit, AfterViewInit {
   displayedColumns = ["seqNo", "description", "duration"];
 
   // С помощью декоратора ViewChild мы получаем из html-шаблона
-  // елемент ссылку на MatPaginator.
-  // Данная ссылка не готова к работе на этапе ngOnInit(),
-  // с ней необходимо работать внутри ngAfterViewInit()
+  // ссылку на MatPaginator.
   @ViewChild(MatPaginator) paginator: MatPaginator;
+
+  // С помощью декоратора ViewChild мы получаем из html-шаблона
+  // ссылку на MatSort.
+  @ViewChild(MatSort) sort: MatSort;
 
   constructor(private route: ActivatedRoute, private coursesService: CoursesService) {}
 
@@ -52,14 +54,30 @@ export class CourseComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
+
+    // Каждый раз когда юзер взаимодействует с MatSort -
+    // отображаем таблицу с pageIndex = 0
+    this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
+    
     // this.paginator.page - это Observable, который эмитит события,
     // когда юзер будет взаимодействовать с MatPaginator внутри html
-    this.paginator.page.pipe(
+    // this.sort.sortChange - это Observable, который эмитит события,
+    // когда юзер будет взаимодействовать с MatSort внутри html
+    // С помощью метода merge - объединяем 2 Observable, таким образом
+    // при взаимодействии с MatPaginator или с MatSort - 
+    // будут выполнятся одинаковые действия
+    merge(this.paginator.page, this.sort.sortChange).pipe(
       // MatPaginator начинает эмитить данные при взаимодействии с юзером -
       // производим загрузку данных в зависимости от данных,
       // полученных с потока
       tap(() => {
-        this.dataSource.loadLessons(this.course.id, '', 'asc', this.paginator.pageIndex, this.paginator.pageSize);
+        this.dataSource.loadLessons(
+          this.course.id, 
+          '', 
+          this.sort.direction, 
+          this.paginator.pageIndex, 
+          this.paginator.pageSize
+        );
       })
     )
     .subscribe();
