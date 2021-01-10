@@ -1,6 +1,6 @@
 import { CollectionViewer, DataSource } from "@angular/cdk/collections";
 import { BehaviorSubject, Observable, of } from "rxjs";
-import { catchError } from "rxjs/operators";
+import { catchError, finalize } from "rxjs/operators";
 import { Lesson } from "../model/lesson";
 import { CoursesService } from "./courses.service";
 
@@ -14,6 +14,14 @@ export class LessonsDatasource implements DataSource<Lesson> {
   // Начальным значением передаем пустой массив
   private lessonSubject = new BehaviorSubject<Lesson[]>([]);
 
+  // Мы будем использовать BehaviorSubject, чтобы эмитить данные из DataSource
+  // для спинера 
+  private loadingSubject = new BehaviorSubject<boolean>(false);
+
+  // asObservable - используется для преобразования subject’а в observable.
+  // Данное значение будет получено в course-компоненте как dataSource.loading$
+  public loading$ = this.loadingSubject.asObservable();
+
   constructor(private coursesService: CoursesService) {}
 
   loadLessons(
@@ -23,12 +31,22 @@ export class LessonsDatasource implements DataSource<Lesson> {
     pageIndex: number, 
     pageSize: number
   ) {
+
+    // Когда начинается загрузка уроков -
+    // пушим значение true в loadingSubject -
+    // чтобы отобразился спиннер
+    this.loadingSubject.next(true);
+
     this.coursesService.findLessons(courseId, filter, sortDirection, pageIndex, pageSize)
       .pipe(
         // catchError() обрабатывает ошибки внутри Observable;
         // обязательно вернуть Observable из catchError().
         // of() создает поток с одним или несколькими элементами, который завершается сразу после их отправки.
-        catchError(() => of([]))
+        catchError(() => of([])),
+
+        // finalize() срабатывает, когда Observable завершил работу;
+        // пушим значение false в loadingSubject - чтобы скрыть спиннер
+        finalize(() => this.loadingSubject.next(false))
       )
       .subscribe(lessons => { 
         // Пушим данные, полученные от сервера, в subject
@@ -56,5 +74,6 @@ export class LessonsDatasource implements DataSource<Lesson> {
   // чтобы удалить все подписки от Observable
   disconnect(collectionViewer: CollectionViewer): void {
     this.lessonSubject.complete();
+    this.loadingSubject.complete();
   }
 }
