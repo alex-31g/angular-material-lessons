@@ -33,14 +33,9 @@
 
 .lessons-table {
   min-height: 360px;
+  margin-top: 10px;
 }
 
 .spinner-container mat-spinner {
   margin: 130px auto 0 auto;
-}
-
-mat-cell,
-mat-header-cell {
-  display: inline-block;
-  min-height: auto;
 }

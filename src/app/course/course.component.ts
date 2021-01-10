@@ -2,12 +2,12 @@ import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angula
 import { ActivatedRoute } from '@angular/router';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 import { Course } from '../model/course';
 import { CoursesService } from '../services/courses.service';
-import { debounceTime, distinctUntilChanged, startWith, tap, timeout } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, startWith, tap, timeout, delay } from 'rxjs/operators';
 import { merge, fromEvent } from 'rxjs';
-import { MatTableDataSource } from '@angular/material/table';
-import { LessonsDatasource } from '../services/lessons.datasourse';
+import { LessonsDataSource } from '../services/lessons.datasource';
 
 @Component({
   selector: 'course',
@@ -17,30 +17,14 @@ import { LessonsDatasource } from '../services/lessons.datasourse';
 export class CourseComponent implements OnInit, AfterViewInit {
   course: Course;
 
-  // DELETE:
-  // MatTableDataSource предоставляет методы, с помощью которых
-  // можно производить sort, paginate и filter массива данных
-  // на стороне клиента
-  // DataSource будет передан в таблицу
-  // dataSource = new MatTableDataSource([]);
+  dataSource: LessonsDataSource;
 
-  // Указываем, что dataSource должен быть экземпляром кастомного 
-  // класса LessonsDatasource, а не MatTableDataSource как ранее,
-  // поскольку мы реализовываем server-side фильтрацию данных
-  dataSource: LessonsDatasource;
+  displayedColumns = ['seqNo', 'description', 'duration'];
 
-  displayedColumns = ["seqNo", "description", "duration"];
-
-  // С помощью декоратора ViewChild мы получаем из html-шаблона
-  // ссылку на MatPaginator.
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
-  // С помощью декоратора ViewChild мы получаем из html-шаблона
-  // ссылку на MatSort.
   @ViewChild(MatSort) sort: MatSort;
 
-  // С помощью декоратора ViewChild мы получаем из html-шаблона
-  // ссылку на элемент, который обозначенный #input
   @ViewChild('input') input: ElementRef;
 
   constructor(private route: ActivatedRoute, private coursesService: CoursesService) {}
@@ -48,64 +32,38 @@ export class CourseComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     this.course = this.route.snapshot.data['course'];
 
-    // this.coursesService.findAllCourseLessons(this.course.id)
-    //   .subscribe(lessons => this.dataSource.data = lessons);
+    this.dataSource = new LessonsDataSource(this.coursesService);
 
-    this.dataSource = new LessonsDatasource(this.coursesService);
-
-    // Загрузка данных для таблицы при первом переходе на страницу
     this.dataSource.loadLessons(this.course.id, '', 'asc', 0, 3);
   }
 
   ngAfterViewInit() {
+    this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
 
-    // Каждый раз когда юзер взаимодействует с MatSort -
-    // отображаем таблицу с pageIndex = 0
-    this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
-
-    // Метод fromEvent - превращает событие в Observable.
-    // 1й параметр - DOM-элемент, на котором произошло событие;
-    // 2й параметр - тип события
     fromEvent(this.input.nativeElement, 'keyup')
       .pipe(
-        // debounceTime - эмитит новые данные только по прошедствии заданного времени
         debounceTime(150),
-        // distinctUntilChanged - эмитит данные только тогда, когда текущее 
-        // значение отличается от последнего.
         distinctUntilChanged(),
         tap(() => {
           this.paginator.pageIndex = 0;
+
           this.loadLessonsPage();
         })
       )
       .subscribe();
-    
-    // this.paginator.page - это Observable, который эмитит события,
-    // когда юзер будет взаимодействовать с MatPaginator внутри html
-    // this.sort.sortChange - это Observable, который эмитит события,
-    // когда юзер будет взаимодействовать с MatSort внутри html
-    // С помощью метода merge - объединяем 2 Observable, таким образом
-    // при взаимодействии с MatPaginator или с MatSort - 
-    // будут выполнятся одинаковые действия
-    merge(this.paginator.page, this.sort.sortChange).pipe(
-      // MatPaginator начинает эмитить данные при взаимодействии с юзером -
-      // производим загрузку данных в зависимости от данных,
-      // полученных с потока
-      tap(() => {
-        this.loadLessonsPage();
-      })
-    )
-    .subscribe();
+
+    merge(this.sort.sortChange, this.paginator.page)
+      .pipe(tap(() => this.loadLessonsPage()))
+      .subscribe();
   }
 
   loadLessonsPage() {
     this.dataSource.loadLessons(
-      this.course.id, 
-      this.input.nativeElement.value, 
-      this.sort.direction, 
-      this.paginator.pageIndex, 
+      this.course.id,
+      this.input.nativeElement.value,
+      this.sort.direction,
+      this.paginator.pageIndex,
       this.paginator.pageSize
     );
   }
-
 }

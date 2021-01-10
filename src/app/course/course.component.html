@@ -1,28 +1,18 @@
 <div class="course">
-
   <h2>{{ course?.description }}</h2>
 
   <img class="course-thumbnail" [src]="course?.iconUrl" />
 
-  <!-- table filter -->
   <mat-form-field>
-    <input matInput placeholder="Search lessons"
-      #input
-    >
+    <input matInput placeholder="Search lessons" #input />
   </mat-form-field>
-  <!-- table filter - end-->
 
   <div class="spinner-container" *ngIf="dataSource.loading$ | async">
     <mat-spinner></mat-spinner>
   </div>
 
-  <!-- table -->
-  <!-- 
-    matSort - указывает, что таблица имеет фичу сортировки;
-    matSortActive="seqNo" - указывает, какая колонка будет использоваться, когда данные будут загружены в первый раз;
-    matSortDirection="asc" - указывает начальный порядок сортировки - ASCending (по возростанию);
-  -->
-  <mat-table class="lessons-table mat-elevation-z8" 
+  <mat-table
+    class="lessons-table mat-elevation-z8"
     [dataSource]="dataSource"
     matSort
     matSortActive="seqNo"
@@ -30,34 +20,27 @@
     matSortDisableClear
   >
     <ng-container matColumnDef="seqNo">
-      <!-- mat-sort-header - указывает, что данная колонка имеет фичу сортировки -->
-      <mat-header-cell *matHeaderCellDef
-        mat-sort-header
-      >#</mat-header-cell>
-      <mat-cell *matCellDef="let lessons">{{ lessons.seqNo }}</mat-cell>
+      <mat-header-cell *matHeaderCellDef mat-sort-header>#</mat-header-cell>
+
+      <mat-cell *matCellDef="let lesson">{{ lesson.seqNo }}</mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="description">
       <mat-header-cell *matHeaderCellDef>Description</mat-header-cell>
-      <mat-cell class="description-cell" *matCellDef="let lessons">{{ lessons.description }}</mat-cell>
+
+      <mat-cell class="description-cell" *matCellDef="let lesson">{{ lesson.description }}</mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="duration">
       <mat-header-cell *matHeaderCellDef>Duration</mat-header-cell>
-      <mat-cell class="duration-cell" *matCellDef="let lessons">{{ lessons.duration }}</mat-cell>
+
+      <mat-cell class="duration-cell" *matCellDef="let lesson">{{ lesson.duration }}</mat-cell>
     </ng-container>
 
     <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-    <mat-row *matRowDef="let row; columns: displayedColumns" ></mat-row>
+
+    <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
   </mat-table>
-  <!-- table - end -->
 
-  <!-- paginator -->
-  <mat-paginator
-    [length]="course?.lessonsCount"
-    [pageSize]="3"
-    [pageSizeOptions]="[3,5,10]"
-  ></mat-paginator>
-  <!-- paginator - end -->
-
+  <mat-paginator [length]="course?.lessonsCount" [pageSize]="3" [pageSizeOptions]="[3, 5, 10]"></mat-paginator>
 </div>
