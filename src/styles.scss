@@ -1,0 +1,48 @@
+// @import '~@angular/material/prebuilt-themes/indigo-pink.css';
+
+// indigo-pink
+// deeppurple-amber
+// pink-bluegrey
+// purple-green
+
+// https://github.com/angular/components/blob/master/src/material/core/theming/prebuilt/indigo-pink.scss
+
+@import '~@angular/material/theming';
+
+@include mat-core();
+
+$primary: mat-palette($mat-green);
+$accent: mat-palette($mat-pink, A200, A100, A400);
+
+$theme: mat-light-theme($primary, $accent);
+
+@include angular-material-theme($theme);
+
+// =======
+// Темы:
+// =======
+// mat-light-theme
+// mat-dark-theme
+
+// =======
+// Цвета:
+// =======
+// $mat-red
+// $mat-pink
+// $mat-purple
+// $mat-deep-purple
+// $mat-indigo
+// $mat-blue
+// $mat-light-blue
+// $mat-cyan
+// $mat-teal
+// $mat-green
+// $mat-light-green
+// $mat-lime
+// $mat-yellow
+// $mat-amber
+// $mat-orange
+// $mat-deep-orange
+// $mat-brown
+// $mat-grey
+// $mat-blue-grey
